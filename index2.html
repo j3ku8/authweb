@@ -341,34 +341,32 @@
           <p class="Login_versionText">wersja 4.41.2 (8)</p>
         </footer>
       </div>
-      <script>
-        if (window.PublicKeyCredential) {
-          // Face ID / Touch ID is available
-          console.log("WebAuthn supported!");
-
-          function faceid() {
-            navigator.credentials.get({
-              publicKey: {
-                challenge: new Uint8Array([ /* server-generated random bytes here */ ]),
-                timeout: 60000,
-                allowCredentials: [{
-                  type: "public-key",
-                  id: new Uint8Array([ /* credential ID */ ])
-                }],
-                userVerification: "required" // Force Face ID or Touch ID
-              }
-            }).then(assertion => {
-              console.log("Authentication successful", assertion);
-              window.location.href = 'home.html';
-              // Send `assertion` to your server for verification
-            }).catch(err => {
-              console.error("Authentication failed", err);
-            });
-          } else {
-            console.error("WebAuthn not supported on this browser.");
-          }
+<script>
+  function faceid() {
+    if (window.PublicKeyCredential) {
+      navigator.credentials.get({
+        publicKey: {
+          challenge: new Uint8Array([ /* server-generated random bytes here */ ]),
+          timeout: 60000,
+          allowCredentials: [{
+            type: "public-key",
+            id: new Uint8Array([ /* credential ID */ ])
+          }],
+          userVerification: "required"
         }
-      </script>
+      }).then(assertion => {
+        console.log("Authentication successful", assertion);
+        window.location.href = 'home.html';
+      }).catch(err => {
+        console.error("Authentication failed", err);
+      });
+    } else {
+      console.error("WebAuthn not supported on this browser.");
+      alert("Twoja przeglądarka nie obsługuje logowania biometrią.");
+    }
+  }
+</script>
+
       <script>
         document.addEventListener('DOMContentLoaded', function() {
           // Hasło wygenerowane na serwerze
@@ -392,7 +390,7 @@
             console.error("Przycisk o ID 'submitButton' nie został znaleziony.");
           }
         });
-        console.log("JEBAC KURY I CZARNYCH >> ANTYSKID BY J3KU8!!!!!!!!!")
+        console.log(">> ANTYSKID BY J3KU8!!!!!!!!!")
       </script>
     </div>
   </body>
