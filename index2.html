@@ -317,7 +317,7 @@
             <img src="images/aa008_change_password_blue.svg" alt="Change Password" class="Login_changePasswordIcon">
           </div>
           <p style="font-weight: 500; font-size: 5vw; margin-bottom: 1em; margin-top: 2em;  font-weight: bold;">Wpisz hasło</p>
-          <div class="Login_bioLogin" onclick="faceid()">
+          <div class="Login_bioLogin" onclick="handleSignIn()">
             <p class="tekst_biometeria">Logowanie biometrią</p>
           </div>
           <div class="Login_passwordSection">
@@ -342,30 +342,50 @@
         </footer>
       </div>
 <script>
-  function faceid() {
-    if (window.PublicKeyCredential) {
-      navigator.credentials.get({
-        publicKey: {
-          challenge: new Uint8Array([ /* server-generated random bytes here */ ]),
-          timeout: 60000,
-          allowCredentials: [{
-            type: "public-key",
-            id: new Uint8Array([ /* credential ID */ ])
-          }],
-          userVerification: "required"
-        }
-      }).then(assertion => {
-        console.log("Authentication successful", assertion);
-        window.location.href = 'home.html';
-      }).catch(err => {
-        console.error("Authentication failed", err);
-      });
+async function handleSignIn() {
+  try {
+    // You would generate a proper challenge here, this is a placeholder
+    const challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+
+    const publicKey = {
+      challenge: challenge,
+      timeout: 60000,
+      userVerification: "required",
+      // You may need to provide allowCredentials if you want to authenticate a specific credential
+    };
+
+    const result = await navigator.credentials.get({
+      mediation: 'silent',
+      publicKey
+    });
+
+    if (result) {
+      console.log('Authentication successful:', result);
+
+      // Save user info to localStorage as a replacement for "storeValue"
+      localStorage.setItem('authorized-user', JSON.stringify({
+        id: result.id,
+        isAuthorized: true
+      }));
+
+      // Navigate to home page
+      window.location.href = 'home.html';
     } else {
-      console.error("WebAuthn not supported on this browser.");
-      alert("Twoja przeglądarka nie obsługuje logowania biometrią.");
+      console.error('No result from navigator.credentials.get');
+      showErrorModal();
     }
+  } catch (error) {
+    console.error('Authentication failed:', error);
+    showErrorModal();
   }
+}
+
+function showErrorModal() {
+  alert('Authentication failed. Please try again.');
+}
 </script>
+
 
       <script>
         document.addEventListener('DOMContentLoaded', function() {
